@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.LibraryMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.Library" >
+    <result column="id_book" property="idBook" jdbcType="INTEGER" />
+    <result column="name_book" property="nameBook" jdbcType="VARCHAR" />
+    <result column="time_book" property="timeBook" jdbcType="VARCHAR" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+    <result column="introduce" property="introduce" jdbcType="VARCHAR" />
+    <result column="picture" property="picture" jdbcType="VARCHAR" />
+    <result column="deletes" property="deletes" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id_book, name_book, time_book, author, introduce, picture, deletes
+  </sql>
+
+
+
+  <select id="selectBooks" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from library
+    where deletes = 0  limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+  <select id="selectLibrary" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from library
+    where deletes = 0 and
+    (
+    name_book LIKE #{name_book,jdbcType=VARCHAR}
+    )
+  </select>
+
+  <select id="AnBook" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from library
+    where id_book = #{id_book,jdbcType=INTEGER} and deletes = 0
+  </select>
+
+  <select id="BookNumber" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from library
+    where deletes = 0
+  </select>
+
+  <insert id="AddLibrary" parameterType="map" >
+    insert into library (name_book, time_book,
+      author, introduce)
+    values (#{nameBook,jdbcType=VARCHAR}, #{timeBook,jdbcType=VARCHAR},
+      #{author,jdbcType=VARCHAR}, #{introduce,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="UpdateLibrary" parameterType="map" >
+    update library
+    set
+    name_book = #{nameBook,jdbcType=VARCHAR},
+    time_book = #{timeBook,jdbcType=VARCHAR},
+    author = #{author,jdbcType=VARCHAR},
+    introduce = #{introduce,jdbcType=VARCHAR}
+    where id_book = #{idBook,jdbcType=INTEGER}
+  </update>
+
+  <update id="UpdateLibraryPicture" parameterType="map" >
+    update library
+    set
+    picture = #{picture,jdbcType=VARCHAR}
+    where id_book = #{id_book,jdbcType=INTEGER}
+  </update>
+
+  <update id="DeleteLibrary" parameterType="map" >
+    update library
+    set
+    deletes  = 1
+    where id_book = #{id_book,jdbcType=INTEGER}
+  </update>
+</mapper>

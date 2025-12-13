@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.TestQuestionsMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.TestQuestions" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+    <result column="title_id" property="titleId" jdbcType="INTEGER" />
+    <result column="option_s" property="optionS" jdbcType="VARCHAR" />
+    <result column="option_value" property="optionValue" jdbcType="VARCHAR" />
+    <result column="deleted" property="deleted" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, paper_id,title_id   , option_s, option_value ,deleted
+  </sql>
+
+  <update id="updateByPrimaryKey" parameterType="map" >
+    update test_questions
+    set
+      option_s = #{optionS,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="Delete" parameterType="map" >
+    update test_questions
+    set
+      deleted = 1
+    where paper_id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="DeleteTiTle" parameterType="map" >
+    update test_questions
+    set
+      deleted = 1
+    where title_id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <select id="selectByPaperId" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from test_questions
+    where paper_id = #{paper_id,jdbcType=INTEGER} and deleted = 0
+  </select>
+
+  <select id="selectByTitleId" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from test_questions
+    where title_id = #{title_id,jdbcType=INTEGER} and deleted = 0
+  </select>
+
+
+  <select id="AllQuestion" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from test_questions
+    where deleted = 0
+    limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+
+  <select id="AllQuestionSum" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from test_questions
+    where deleted = 0
+  </select>
+
+  <insert id="insert" parameterType="map" >
+    insert into test_questions (paper_id,title_id, option_s, option_value)
+    values (#{idPaper,jdbcType=INTEGER},#{idTitle,jdbcType=INTEGER}, #{optionS,jdbcType=VARCHAR},
+   #{OptionValue,jdbcType=VARCHAR})
+  </insert>
+</mapper>

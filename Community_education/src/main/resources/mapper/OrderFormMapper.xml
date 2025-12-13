@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.OrderFormMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.OrderForm" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="commodityId" property="commodityId" jdbcType="INTEGER" />
+    <id column="states" property="states" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="telephone" property="telephone" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="dates" property="dates" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="BaseResultMap1" type="com.example.community_education.Model.OrderFormPlus" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="commodityId" property="commodityId" jdbcType="INTEGER" />
+    <id column="states" property="states" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="telephone" property="telephone" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="dates" property="dates" jdbcType="TIMESTAMP" />
+    <result column="trade_name" property="tradeName" jdbcType="VARCHAR" />
+    <result column="points" property="points" jdbcType="INTEGER" />
+    <result column="introduce" property="introduce" jdbcType="LONGVARCHAR" />
+    <result column="picture" property="picture" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, commodityId, user_name, telephone, phone, address, remark, dates,states
+  </sql>
+  <sql id="Base_Column_List1" >
+    order_form.id, commodityId, user_name, telephone, phone, address, remark, dates,states, trade_name, points, introduce, picture
+  </sql>
+
+  <select id="SelectMyGoods" resultMap="BaseResultMap1" parameterType="map">
+    select
+    <include refid="Base_Column_List1" />
+    from order_form,commodity
+    where telephone = #{telephone,jdbcType=VARCHAR} and commodity.id = order_form.commodityId
+  </select>
+
+  <insert id="insert" parameterType="map" >
+    insert into order_form (user_name, commodityId,telephone,
+      phone, address, remark, dates
+      )
+    values (#{userName,jdbcType=VARCHAR}, #{commodityId,jdbcType=INTEGER},#{telephone,jdbcType=VARCHAR},
+      #{phone,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{dates,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <update id="updateStates" parameterType="map" >
+    update order_form
+    set
+    states = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="SelectAll" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from order_form
+    limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+  <select id="OrderSum" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from order_form
+  </select>
+</mapper>

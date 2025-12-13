@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.CharacterProjectMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.CharacterProject" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+    <result column="dates" property="dates" jdbcType="TIMESTAMP" />
+    <result column="texts" property="texts" jdbcType="LONGVARCHAR" />
+    <result column="images" property="images" jdbcType="VARCHAR" />
+    <result column="deletes" property="deletes" jdbcType="INTEGER" />
+    <result column="types" property="types" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, title, area, dates, texts, images, deletes, types
+  </sql>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="map">
+    insert into
+      character_project (title, area,
+      dates, texts,types)
+    values ( #{title,jdbcType=VARCHAR}, #{area,jdbcType=VARCHAR},
+      #{dates,jdbcType=TIMESTAMP},#{texts,jdbcType=LONGVARCHAR}, #{types,jdbcType=INTEGER})
+  </insert>
+  <select id="AllProject" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from character_project
+    where deletes = 0
+    order by dates DESC
+    limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+  <select id="AnProject" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from character_project
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+
+  <select id="ProjectNumber" resultType="java.lang.Integer">
+    select
+    COUNT(*)
+    from character_project
+    where deletes = 0
+  </select>
+
+
+  <select id="selectCharacterProject" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from character_project
+    where  deletes = 0 and
+    (
+    title LIKE #{title,jdbcType=VARCHAR}
+    or
+    area LIKE #{area,jdbcType=VARCHAR}
+    )
+    order by dates DESC
+  </select>
+
+
+  <update id="updateImages" parameterType="map">
+    update character_project
+    set
+      images = #{images,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="update" parameterType="map" >
+    update character_project
+    set
+        title = #{title,jdbcType=VARCHAR},
+        area = #{area,jdbcType=VARCHAR},
+        texts = #{texts,jdbcType=LONGVARCHAR},
+        types = #{types,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="delete" parameterType="map" >
+    update character_project
+    set
+        deletes = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+</mapper>

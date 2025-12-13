@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.NewNoticeMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.NewNotice" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+    <result column="sources" property="sources" jdbcType="VARCHAR" />
+    <result column="dates" property="dates" jdbcType="TIMESTAMP" />
+    <result column="hits" property="hits" jdbcType="INTEGER" />
+    <result column="texts" property="texts" jdbcType="LONGVARCHAR" />
+    <result column="images" property="images" jdbcType="VARCHAR" />
+    <result column="deletes" property="deletes" jdbcType="INTEGER" />
+    <result column="types" property="types" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, title, author, sources, dates, hits, texts, deletes, types
+  </sql>
+
+  <update id="updateByPrimaryKey" parameterType="map">
+    update New_Notice
+    set
+      title = #{title,jdbcType=VARCHAR},
+      author = #{author,jdbcType=VARCHAR},
+      sources = #{sources,jdbcType=VARCHAR},
+      hits = #{hits,jdbcType=INTEGER},
+      texts = #{texts,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+
+  <select id="NewNoticeNumber" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from New_Notice
+    where types = #{types,jdbcType=INTEGER} and deletes = 0
+  </select>
+
+  <select id="AllNewNotice" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from New_Notice
+    where types = #{types,jdbcType=INTEGER} and deletes = 0
+    order by dates DESC
+    limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+  <select id="AllNewNotices" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from New_Notice
+    where  deletes = 0
+    order by dates DESC
+    limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+  <select id="selectNewNotice" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from New_Notice
+    where  deletes = 0 and
+    (
+    title LIKE #{title,jdbcType=VARCHAR}
+    or
+    author LIKE #{author,jdbcType=VARCHAR}
+    )
+    order by dates DESC
+  </select>
+
+  <select id="TheNewNotice" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from New_Notice
+    where types = #{types,jdbcType=INTEGER} and id = #{id,jdbcType=INTEGER} and deletes = 0
+  </select>
+
+
+  <update id="deleteNewNotice" parameterType="map">
+    update New_Notice
+    set
+      deletes = 1
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <insert id="insert" parameterType="map">
+    insert into
+      New_Notice (title, author,
+      sources, dates, hits,
+      texts, types)
+    values ( #{title,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR},
+      #{sources,jdbcType=VARCHAR}, #{dates,jdbcType=TIMESTAMP}, #{hits,jdbcType=INTEGER},
+      #{texts,jdbcType=LONGVARCHAR}, #{types,jdbcType=INTEGER})
+  </insert>
+
+
+  <update id="NewNoticeHit" parameterType="map">
+    update New_Notice
+    set
+      hits = hits+1
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+
+</mapper>

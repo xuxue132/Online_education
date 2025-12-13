@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.BookContentMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.BookContent" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="id_book" property="idBook" jdbcType="INTEGER" />
+    <result column="Catalog" property="catalog" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, id_book, Catalog, content
+  </sql>
+
+
+  <select id="TheBook" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from book_content
+    where id_book = #{id_book,jdbcType=INTEGER}
+  </select>
+
+  <select id="AllBookContent" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from book_content
+    limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+  <select id="TheBookText" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from book_content
+    where id_book = #{id_book,jdbcType=INTEGER} and id = #{id,jdbcType=INTEGER}
+  </select>
+
+
+
+  <select id="AllBookContentSum" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from book_content
+  </select>
+
+  <delete id="DeleteBookContent" parameterType="map" >
+    delete from book_content
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="DeleteBookContentPlus" parameterType="map" >
+    delete from book_content
+    where id_book = #{id_book,jdbcType=INTEGER}
+  </delete>
+
+
+  <insert id="AddBookContents" parameterType="map" >
+    insert into book_content (id_book,Catalog, content)
+    values (#{idBook,jdbcType=INTEGER}, #{catalog,jdbcType=VARCHAR},
+      #{content,jdbcType=LONGVARCHAR})
+  </insert>
+
+  <update id="ChangeBookContents" parameterType="map" >
+    update book_content
+    set
+    `Catalog` = #{catalog,jdbcType=VARCHAR},
+    content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

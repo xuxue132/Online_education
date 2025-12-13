@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.RolePermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.RolePermission" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="permissionStatus" property="permissionStatus" jdbcType="VARCHAR" />
+    <result column="roleName" property="roleName" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    role_permission.ID, permissionStatus, role_permission.roleName
+  </sql>
+
+  <select id="selectStatus" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from role_permission,user_role,user_inf
+    where role_permission.roleName = user_role.roleName
+    and user_inf.telephone = #{telephone,jdbcType=VARCHAR} and user_inf.telephone = user_role.telephone and user_role.deleted = 0
+    and user_inf.deleted = 0
+  </select>
+</mapper>

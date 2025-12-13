@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.FileMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.File" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="file_id" property="fileId" jdbcType="INTEGER" />
+    <result column="FileName" property="filename" jdbcType="VARCHAR" />
+    <result column="FileUrl" property="fileurl" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, file_id, FileName, FileUrl
+  </sql>
+
+
+  <select id="selectFile" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from file
+    where file_id = #{fileId,jdbcType=INTEGER}
+  </select>
+
+  <select id="SumFile" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from file
+  </select>
+
+  <select id="AllFile" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from file
+    limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+  <insert id="AddFile" parameterType="map" >
+    insert into file (file_id, FileName,
+      FileUrl)
+    values (#{file_id,jdbcType=INTEGER}, #{FileName,jdbcType=VARCHAR},
+      #{FileUrl,jdbcType=VARCHAR})
+  </insert>
+
+  <delete id="DeleteFileName" parameterType="java.lang.Integer" >
+    delete from file
+    where file_id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="DeleteFileNamePlus" parameterType="java.lang.Integer" >
+    delete from file
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+</mapper>

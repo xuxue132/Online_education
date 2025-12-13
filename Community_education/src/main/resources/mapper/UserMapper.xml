@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.UserInf" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="telephone" property="telephone" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="VARCHAR" />
+    <result column="birthday" property="birthday" jdbcType="TIMESTAMP" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+    <result column="background" property="background" jdbcType="VARCHAR" />
+    <result column="job" property="job" jdbcType="VARCHAR" />
+    <result column="hobby" property="hobby" jdbcType="VARCHAR" />
+    <result column="integral" property="integral" jdbcType="INTEGER" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="deleted" property="deleted" jdbcType="INTEGER" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="picture" property="picture" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, username, user_inf.telephone, sex, birthday, email, area, background, job, hobby, integral,password,
+    user_inf.deleted, createTime, picture
+  </sql>
+  <sql id="Base_Column_List_role" >
+    user_inf.id, username, user_inf.telephone, sex, birthday, email, area, background, job, hobby, integral,password
+    , user_inf.deleted,createTime, user_role.roleName, picture
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_inf
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+
+
+  <select id="selectPeopleByPhone" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List"/>
+    from user_inf
+    where user_inf.telephone = #{telephone,jdbcType=VARCHAR}
+  </select>
+  <select id="selectPeopleByNewPhone" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List"/>
+    from user_inf
+    where user_inf.telephone = #{NewTelephone,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectPeopleByEmail" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List"/>
+    from user_inf
+    where user_inf.email = #{email,jdbcType=VARCHAR}
+  </select>
+
+
+  <select id="AllUser" resultType="com.example.community_education.Model.UserInfRole"  parameterType="map" >
+    select
+    <include refid="Base_Column_List_role"/>
+    from user_inf,user_role
+    where   user_inf.telephone = user_role.telephone limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+  <select id="selectUser" resultType="com.example.community_education.Model.UserInfRole"  parameterType="map" >
+    select
+    <include refid="Base_Column_List_role"/>
+    from user_inf,user_role
+    where   user_inf.telephone = user_role.telephone and
+    ( username LIKE #{userName,jdbcType=VARCHAR}
+    or user_inf.telephone LIKE #{telephone,jdbcType=VARCHAR}
+    )
+
+  </select>
+
+
+
+  <select id="UserSum" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from user_inf
+  </select>
+  <select id="selectPeopleByThePhone" resultType="com.example.community_education.Model.UserInfRole"  parameterType="map" >
+    select
+    <include refid="Base_Column_List_role"/>
+    from user_inf,user_role
+    where user_inf.telephone = #{telephone,jdbcType=VARCHAR} and user_inf.deleted = 0 and user_inf.telephone = user_role.telephone
+  </select>
+
+
+
+  <insert id="newUserAdd" parameterType="map">
+    insert into  user_inf(username,telephone,password,picture,createTime) values (#{username,jdbcType=VARCHAR}, #{telephone,jdbcType=VARCHAR},
+                                  #{password,jdbcType=VARCHAR},#{picture,jdbcType=VARCHAR},
+                                  #{createTime,jdbcType=TIMESTAMP})
+
+
+  </insert>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.community_education.Model.UserInf" >
+    update user_inf
+    <set >
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="telephone != null" >
+        telephone = #{telephone,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null" >
+        birthday = #{birthday,jdbcType=TIMESTAMP},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null" >
+        area = #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="background != null" >
+        background = #{background,jdbcType=VARCHAR},
+      </if>
+      <if test="job != null" >
+        job = #{job,jdbcType=VARCHAR},
+      </if>
+      <if test="hobby != null" >
+        hobby = #{hobby,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="deleted != null" >
+        deleted = #{deleted,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.community_education.Model.UserInf" >
+    update user_inf
+    set username = #{username,jdbcType=VARCHAR},
+      telephone = #{telephone,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      birthday = #{birthday,jdbcType=TIMESTAMP},
+      email = #{email,jdbcType=VARCHAR},
+      area = #{area,jdbcType=VARCHAR},
+      background = #{background,jdbcType=VARCHAR},
+      job = #{job,jdbcType=VARCHAR},
+      hobby = #{hobby,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      deleted = #{deleted,jdbcType=INTEGER},
+      createTime = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPhone" parameterType="map">
+    update user_inf
+    set
+      username = #{username,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      birthday = #{birthday,jdbcType=TIMESTAMP},
+      email = #{email,jdbcType=VARCHAR},
+      area = #{area,jdbcType=VARCHAR},
+      background = #{background,jdbcType=VARCHAR},
+      job = #{job,jdbcType=VARCHAR},
+      hobby = #{hobby,jdbcType=VARCHAR}
+    where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+
+  <update id="ChangeTelPhone" parameterType="map">
+    update user_inf
+    set
+      telephone = #{NewTelephone,jdbcType=VARCHAR}
+    where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+
+  <update id="ChangeEmail" parameterType="map">
+    update user_inf
+    set
+      email = #{NewEmail,jdbcType=VARCHAR}
+    where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+
+  <update id="AddEmail" parameterType="map">
+    update user_inf
+    set
+      email = #{NewEmail,jdbcType=VARCHAR}
+    where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+
+  <update id="ChangePassword" parameterType="map">
+    update user_inf
+    set
+      password = #{NewPassword,jdbcType=VARCHAR}
+    where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+  <update id="ChangePasswordPlus" parameterType="map">
+    update user_inf
+    set
+      password = #{NewPassword,jdbcType=VARCHAR}
+    where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+
+  <update id="headPicture" parameterType="java.lang.String">
+    update user_inf
+    set
+      picture = #{uploadFile,jdbcType=VARCHAR}
+    where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+
+  <update id="ChangeIntegral" parameterType="map">
+    update user_inf
+    set
+      integral = integral + #{sorce,jdbcType=INTEGER}
+      where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+
+  <update id="DeleteUser" parameterType="map">
+    update user_inf
+    set
+      deleted = 1
+      where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+  <update id="UnDeleteUser" parameterType="map">
+    update user_inf
+    set
+      deleted = 0
+      where telephone = #{telephone,jdbcType=VARCHAR}
+  </update>
+</mapper>

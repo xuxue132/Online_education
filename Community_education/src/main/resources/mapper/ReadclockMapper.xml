@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.ReadclockMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.Readclock" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="content_id" property="contentId" jdbcType="INTEGER" />
+    <result column="id_book" property="idBook" jdbcType="INTEGER" />
+    <result column="telephone" property="telephone" jdbcType="VARCHAR" />
+    <result column="read_time" property="readTime" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, content_id, id_book, telephone, read_time
+  </sql>
+
+  <update id="ReadClock" parameterType="map">
+    insert into ReadClock (content_id, id_book, telephone, read_time)
+    values
+    ( #{contentId,jdbcType=INTEGER},
+      #{idBook,jdbcType=INTEGER},
+      #{telephone,jdbcType=INTEGER},
+      #{readTime,jdbcType=VARCHAR}
+    )
+  </update>
+
+
+  <select id="UserClock" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from ReadClock
+    where
+    content_id = #{contentId,jdbcType=INTEGER} and
+    id_book = #{idBook,jdbcType=INTEGER} and
+    telephone = #{telephone,jdbcType=INTEGER}
+  </select>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.PaperAnswerMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.PaperAnswer" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="paper_id" property="paperId" jdbcType="INTEGER" />
+    <result column="title_id" property="titleId" jdbcType="INTEGER" />
+    <result column="answers" property="answers" jdbcType="VARCHAR" />
+    <result column="telephone" property="telephone" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, paper_id, title_id, answers, telephone
+  </sql>
+
+
+  <select id="SelectAnswer" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from paper_answer
+    where telephone = #{telephone,jdbcType=VARCHAR} and paper_id = #{paperId,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insert" parameterType="map" >
+    insert into paper_answer ( paper_id, title_id,
+      answers, telephone)
+    values (#{paperId,jdbcType=INTEGER}, #{titleId,jdbcType=INTEGER},
+      #{answers,jdbcType=VARCHAR}, #{telephone,jdbcType=VARCHAR})
+  </insert>
+</mapper>

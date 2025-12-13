@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.CommodityMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.Commodity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="trade_name" property="tradeName" jdbcType="VARCHAR" />
+    <result column="points" property="points" jdbcType="INTEGER" />
+    <result column="introduce" property="introduce" jdbcType="LONGVARCHAR" />
+    <result column="picture" property="picture" jdbcType="VARCHAR" />
+    <result column="deletes" property="deletes" jdbcType="INTEGER" />
+  </resultMap>
+
+
+  <sql id="Base_Column_List" >
+    id, trade_name, points, introduce, picture, deletes
+  </sql>
+
+  <update id="ChangeCommodity" parameterType="map" >
+    update commodity
+    set
+      trade_name = #{tradeName,jdbcType=VARCHAR},
+      points = #{points,jdbcType=INTEGER},
+      introduce = #{introduce,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="DeleteCommodity" parameterType="map" >
+    update commodity
+    set
+      deletes = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="SelectGoods" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from commodity
+    where deletes = 0 limit #{NowPage,jdbcType=INTEGER},10
+  </select>
+
+  <select id="SelectAnGoods" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from commodity
+    where deletes = 0 and id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="GoodsNumber" resultType="java.lang.Integer" parameterType="map">
+    select
+    COUNT(*)
+    from commodity
+    where deletes = 0
+  </select>
+  <update id="updateImages" parameterType="map">
+    update commodity
+    set
+      picture = #{picture,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <insert id="AddCommodity" parameterType="map" >
+    insert into commodity (trade_name, points,
+      introduce
+      )
+    values (#{tradeName,jdbcType=VARCHAR}, #{points,jdbcType=INTEGER},
+      #{introduce,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <select id="selectCommodity" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from commodity
+    where  deletes = 0 and
+    (
+    trade_name LIKE #{name,jdbcType=VARCHAR}
+    )
+  </select>
+</mapper>
