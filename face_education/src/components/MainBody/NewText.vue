@@ -74,12 +74,30 @@
                         fileurl: '',
                         deletes: '',
                         types: '',
+                    },
+                // 记录浏览历史
+                recordBrowseHistory() {
+                    // 只有登录用户才记录浏览历史
+                    if (this.$store.state.Authorization) {
+                        this.$axios.post('public/RecordBrowseHistory', {
+                            token: this.$store.state.Authorization,
+                            newsId: parseInt(this.$route.query.id)
+                        }, {
+                            headers: {'Authorization': this.$store.state.Authorization}
+                        }).then(resp => {
+                            // 记录成功，不需要处理响应
+                        }).catch(resp => {
+                            // 记录失败也不影响主业务流程
+                            console.log('记录浏览历史失败');
+                        })
                     }
+                }
                 }
             },
 
             created(){
                 this.NewNotices();
+                this.recordBrowseHistory();
             },
         
             methods: {
