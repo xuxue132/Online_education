@@ -30,7 +30,7 @@
             bh.id, 
             bh.user_id, 
             bh.news_id, 
-            bh.browse_time,
+            date_format(bh.browse_time, '%Y-%m-%d %H:%i:%s') as browse_time,
             nn.title,
             nn.author,
             nn.sources,
