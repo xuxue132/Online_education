@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.community_education.Dao.BrowseHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.example.community_education.Model.BrowseHistory">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="news_id" property="newsId" />
+        <result column="browse_time" property="browseTime" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.community_education.Model.BrowseHistory">
+        insert into browse_history (user_id, news_id, browse_time)
+        values (#{userId}, #{newsId}, #{browseTime})
+    </insert>
+
+    <update id="updateBrowseTime">
+        update browse_history
+        set browse_time = #{browseTime}
+        where user_id = #{userId} and news_id = #{newsId}
+    </update>
+
+    <select id="selectByUserIdAndNewsId" resultMap="BaseResultMap">
+        select id, user_id, news_id, browse_time
+        from browse_history
+        where user_id = #{userId} and news_id = #{newsId}
+    </select>
+
+    <select id="selectByUserId" resultType="java.util.Map">
+        select 
+            bh.id, 
+            bh.user_id, 
+            bh.news_id, 
+            date_format(bh.browse_time, '%Y-%m-%d %H:%i:%s') as browse_time,
+            nn.title,
+            nn.author,
+            nn.sources,
+            nn.dates,
+            nn.hits
+        from browse_history bh
+        inner join new_notice nn on bh.news_id = nn.id
+        where bh.user_id = #{userId} and bh.browse_time >= #{startTime}
+        order by bh.browse_time desc
+    </select>
+
+    <delete id="deleteByUserId">
+        delete from browse_history
+        where user_id = #{userId}
+    </delete>
+</mapper>
