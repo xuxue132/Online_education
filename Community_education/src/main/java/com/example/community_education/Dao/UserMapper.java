@@ -51,4 +51,6 @@ public interface UserMapper {
     void ChangePasswordPlus(Map<String, Object> map);
 
     UserInf selectPeopleByNewPhone(Map<String, Object> map);
+
+    UserInf selectByPhone(String telephone);
 }

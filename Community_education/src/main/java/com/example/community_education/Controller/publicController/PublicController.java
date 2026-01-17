@@ -1,7 +1,10 @@
 package com.example.community_education.Controller.publicController;
 
+import com.example.community_education.Model.Comment;
+import com.example.community_education.Model.UserInf;
 import com.example.community_education.Service.impl.*;
 import com.example.community_education.Tool.Result;
+import com.example.community_education.Tool.ResultTool;
 import com.example.community_education.Tool.Token.TokenUtil;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +51,8 @@ public class PublicController {
     FileInformationImpl fileInformationimpl;
     @Resource
     TextPictureImpl textPictureimpl;
+    @Resource
+    CommentServiceImpl commentServiceImpl;
 
     /**
      * 用户信息
@@ -442,7 +447,76 @@ public class PublicController {
         newNoticeimpl.NewNoticeHit(map);
     }
 
+    /**
+     * 获取新闻评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetComments",method = RequestMethod.POST)
+    public Result GetComments(@RequestBody Map<String, Object> map) {
+        Integer newsId = Integer.parseInt(map.get("newsId").toString());
+        return ResultTool.success(commentServiceImpl.getCommentsByNewsId(newsId));
+    }
 
+    /**
+     * 添加评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/AddComment",method = RequestMethod.POST)
+    public Result AddComment(@RequestBody Map<String, Object> map) {
+        String telephone = TokenUtil.getUsername((String) map.get("token"));
+        UserInf user = userServiceimpl.SelectUserByPhone(telephone);
+        if (user == null) {
+                return ResultTool.error("用户不存在");
+            }
 
+        Comment comment = new Comment();
+        comment.setNewsId(Integer.parseInt(map.get("newsId").toString()));
+        comment.setUserId(user.getId());
+        comment.setContent((String) map.get("content"));
+        
+        if (map.get("parentId") != null && !map.get("parentId").toString().isEmpty()) {
+            comment.setParentId(Integer.parseInt(map.get("parentId").toString()));
+        }
+        if (map.get("replyToUserId") != null && !map.get("replyToUserId").toString().isEmpty()) {
+            comment.setReplyToUserId(Integer.parseInt(map.get("replyToUserId").toString()));
+        }
+        comment.setCreateTime(new java.util.Date());
+
+        int result = commentServiceImpl.addComment(comment);
+        if (result > 0) {
+            return ResultTool.success("评论成功");
+        } else {
+            return ResultTool.error("评论失败");
+        }
+    }
+
+    /**
+     * 删除评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/DeleteComment",method = RequestMethod.POST)
+    public Result DeleteComment(@RequestBody Map<String, Object> map) {
+        String telephone = TokenUtil.getUsername((String) map.get("token"));
+        UserInf user = userServiceimpl.SelectUserByPhone(telephone);
+        if (user == null) {
+            return ResultTool.error("用户不存在");
+        }
+
+        Integer commentId = Integer.parseInt(map.get("commentId").toString());
+        Comment comment = commentServiceImpl.getCommentById(commentId);
+        if (comment == null) {
+            return ResultTool.error("评论不存在");
+        }
+        if (!comment.getUserId().equals(user.getId())) {
+            return ResultTool.error("无权限删除此评论");
+        }
+
+        int result = commentServiceImpl.deleteComment(commentId);
+        if (result > 0) {
+            return ResultTool.success("删除成功");
+        } else {
+            return ResultTool.error("删除失败");
+        }
+    }
 
 }
