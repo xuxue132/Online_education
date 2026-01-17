@@ -233,3 +233,7 @@ create table user_role
     comment '用户角色表';
 
 
+insert (permissionStatus,roleName)VALUES ('1', '用户');
+insert into role_permission (permissionStatus,roleName)VALUES ('1', '用户');
+insert into role_permission (permissionStatus,roleName)VALUES ('2', '管理员');
+update user_role set roleName = '管理员' where telephone = '15178959726';
