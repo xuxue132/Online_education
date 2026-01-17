@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.CommentMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.Comment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="news_id" property="newsId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="reply_to_user_id" property="replyToUserId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="deleted" property="deleted" jdbcType="INTEGER" />
+  </resultMap>
+
+  <resultMap id="CommentWithUserResultMap" type="com.example.community_education.Model.Comment" extends="BaseResultMap">
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="reply_to_username" property="replyToUsername" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, news_id, user_id, content, parent_id, reply_to_user_id, create_time, deleted
+  </sql>
+
+  <insert id="insert" parameterType="com.example.community_education.Model.Comment" useGeneratedKeys="true" keyProperty="id">
+    insert into Comment (news_id, user_id, content, parent_id, reply_to_user_id, create_time, deleted)
+    values (#{newsId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR}, 
+            #{parentId,jdbcType=INTEGER}, #{replyToUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 0)
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.example.community_education.Model.Comment">
+    update Comment
+    set content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByNewsId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from Comment
+    where news_id = #{newsId,jdbcType=INTEGER} and deleted = 0
+    order by create_time asc
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from Comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" >
+    delete from Comment where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <select id="selectCommentsWithUserInfo" resultMap="CommentWithUserResultMap">
+    select c.*, u.username, ru.username as reply_to_username
+    from Comment c
+    left join User_Inf u on c.user_id = u.id
+    left join User_Inf ru on c.reply_to_user_id = ru.id
+    where c.news_id = #{newsId,jdbcType=INTEGER} and c.deleted = 0
+    order by c.create_time asc
+  </select>
+</mapper>
