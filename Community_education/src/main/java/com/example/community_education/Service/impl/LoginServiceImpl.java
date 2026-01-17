@@ -31,7 +31,7 @@ public class LoginServiceImpl implements LoginService {
     public LoginResponse setLoginResponse(UserInf userInf) {
         LoginResponse response = new LoginResponse();
         RolePermission rolePermission = rolePermissionMapper.selectStatus(userInf.getTelephone());
-        response.setToken(TokenUtil.sign(rolePermission.getPermissionStatus(), userInf.getTelephone()));
+        response.setToken(TokenUtil.sign(rolePermission.getPermissionStatus(), userInf.getTelephone(), userInf.getId()));
         response.setIdentity(rolePermission.getPermissionStatus());
         response.setUserInf(userInf);
         return response;

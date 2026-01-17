@@ -1,5 +1,6 @@
 package com.example.community_education.Controller.publicController;
 
+import com.example.community_education.Model.Comment;
 import com.example.community_education.Service.impl.*;
 import com.example.community_education.Tool.Result;
 import com.example.community_education.Tool.Token.TokenUtil;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -48,6 +51,8 @@ public class PublicController {
     FileInformationImpl fileInformationimpl;
     @Resource
     TextPictureImpl textPictureimpl;
+    @Resource
+    CommentServiceImpl commentServiceimpl;
 
     /**
      * 用户信息
@@ -442,7 +447,67 @@ public class PublicController {
         newNoticeimpl.NewNoticeHit(map);
     }
 
+    /**
+     * 获取新闻评论列表
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetComments", method = RequestMethod.POST)
+    public Result GetComments(@RequestBody Map<String, Object> map) {
+        Integer newsId = Integer.parseInt(map.get("newsId").toString());
+        return commentServiceimpl.getCommentsByNewsId(newsId);
+    }
 
+    /**
+     * 添加评论
+     *
+     * @param map
+     * @param request*/
+    @RequestMapping(value = "/AddComment", method = RequestMethod.POST)
+    public Result AddComment(@RequestBody Map<String, Object> map, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        Integer userId = TokenUtil.getUserId(token);
+        String username = TokenUtil.getUsername(token);
 
+        Comment comment = new Comment();
+        comment.setNewsId(Integer.parseInt(map.get("newsId").toString()));
+        comment.setUserId(userId);
+        comment.setUsername(username);
+        comment.setContent(map.get("content").toString());
 
+        if (map.containsKey("parentId") && map.get("parentId") != null) {
+            comment.setParentId(Integer.parseInt(map.get("parentId").toString()));
+            if (map.containsKey("replyUsername") && map.get("replyUsername") != null) {
+                comment.setReplyUsername(map.get("replyUsername").toString());
+            }
+            if (map.containsKey("replyUserId") && map.get("replyUserId") != null) {
+                comment.setReplyUserId(Integer.parseInt(map.get("replyUserId").toString()));
+            }
+        }
+
+        comment.setCreateTime(new Date());
+        return commentServiceimpl.addComment(comment);
+    }
+
+    /**
+     * 删除评论
+     *
+     * @param map
+     * @param request*/
+    @RequestMapping(value = "/DeleteComment", method = RequestMethod.POST)
+    public Result DeleteComment(@RequestBody Map<String, Object> map, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        Integer userId = TokenUtil.getUserId(token);
+        Integer commentId = Integer.parseInt(map.get("commentId").toString());
+        return commentServiceimpl.deleteComment(commentId, userId);
+    }
+
+    /**
+     * 获取评论数量
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetCommentCount", method = RequestMethod.POST)
+    public Result GetCommentCount(@RequestBody Map<String, Object> map) {
+        Integer newsId = Integer.parseInt(map.get("newsId").toString());
+        return commentServiceimpl.getCommentCountByNewsId(newsId);
+    }
 }

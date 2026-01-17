@@ -22,7 +22,7 @@ public class TokenUtil {
     /**
      * 生成token
      * */
-    public static String sign(String role, String number){
+    public static String sign(String role, String number, Integer userId){
         String token = null;
         String identity = getIdentity(role);
         try {
@@ -32,6 +32,7 @@ public class TokenUtil {
                     .withClaim("role",identity)        //存放用户角色
                     .withIssuer("auth0")    //发行人
                     .withClaim("username",number)    //存放账号
+                    .withClaim("userId", userId) //存放用户ID
                     .withExpiresAt(expireAt)                          //过期时间
                     .sign(Algorithm.HMAC256(TOKEN_SECRET));
         }catch (IllegalArgumentException| JWTCreationException je){
@@ -75,6 +76,16 @@ public class TokenUtil {
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
         return decodedJWT.getClaim("username").asString();
 
+    }
+
+    /**
+     * 获取用户ID
+     * **/
+    public static Integer getUserId(String token){
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKEN_SECRET)).withIssuer("auth0").build();//创建token验证器
+
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        return decodedJWT.getClaim("userId").asInt();
     }
 
 
