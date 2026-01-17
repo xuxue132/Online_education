@@ -44,6 +44,105 @@
                     </div>
                 </div>
                 
+                <!-- 评论区 -->
+                <div class="comment-section" style="margin-top: 50px; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                    <h3 style="margin-bottom: 20px; color: #333;">评论区 ({{commentCount}})</h3>
+                    
+                    <!-- 发表评论 -->
+                    <div class="comment-input" style="margin-bottom: 30px;">
+                        <textarea 
+                            v-model="newCommentContent" 
+                            placeholder="请输入您的评论..."
+                            style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"
+                        ></textarea>
+                        <button 
+                            @click="submitComment"
+                            style="margin-top: 10px; padding: 8px 20px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer;"
+                        >发表评论</button>
+                    </div>
+                    
+                    <!-- 评论列表 -->
+                    <div class="comment-list">
+                        <div 
+                            v-for="comment in comments" 
+                            :key="comment.id"
+                            class="comment-item"
+                            style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                        >
+                            <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="font-weight: bold; color: #333;">{{comment.username}}</div>
+                                <div style="font-size: 12px; color: #999;">{{comment.createTime}}</div>
+                            </div>
+                            <div class="comment-content" style="margin-bottom: 10px; color: #555;">
+                                {{comment.content}}
+                            </div>
+                            <div class="comment-actions" style="display: flex; gap: 15px; font-size: 14px;">
+                                <a 
+                                    @click="replyComment(comment)"
+                                    style="color: #007bff; cursor: pointer; text-decoration: none;"
+                                >回复</a>
+                                <a 
+                                    v-if="comment.userId === userId"
+                                    @click="deleteComment(comment.id)"
+                                    style="color: #dc3545; cursor: pointer; text-decoration: none;"
+                                >删除</a>
+                            </div>
+                            
+                            <!-- 二级评论列表 -->
+                            <div class="reply-list" style="margin-top: 15px; margin-left: 40px;">
+                                <div 
+                                    v-for="reply in comment.replies" 
+                                    :key="reply.id"
+                                    class="reply-item"
+                                    style="margin-bottom: 10px; padding: 10px; background: #f9f9f9; border-radius: 4px;"
+                                >
+                                    <div class="reply-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <div style="font-weight: bold; color: #333;">{{reply.username}}</div>
+                                        <div style="font-size: 12px; color: #999;">{{reply.createTime}}</div>
+                                    </div>
+                                    <div class="reply-content" style="margin-bottom: 8px; color: #555;">
+                                        <span style="color: #007bff;">@{{reply.replyUsername}}</span> {{reply.content}}
+                                    </div>
+                                    <div class="reply-actions" style="display: flex; gap: 15px; font-size: 14px;">
+                                        <a 
+                                            @click="replyComment(reply)"
+                                            style="color: #007bff; cursor: pointer; text-decoration: none;"
+                                        >回复</a>
+                                        <a 
+                                            v-if="reply.userId === userId"
+                                            @click="deleteComment(reply.id)"
+                                            style="color: #dc3545; cursor: pointer; text-decoration: none;"
+                                        >删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 回复输入框 -->
+                            <div 
+                                v-if="replyToComment && replyToComment.id === comment.id"
+                                class="reply-input"
+                                style="margin-top: 15px; margin-left: 40px;"
+                            >
+                                <textarea 
+                                    v-model="replyContent" 
+                                    :placeholder="'回复 @' + comment.username + '...'"
+                                    style="width: 100%; min-height: 60px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"
+                                ></textarea>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button 
+                                        @click="submitReply"
+                                        style="padding: 6px 16px; background: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer;"
+                                    >发送回复</button>
+                                    <button 
+                                        @click="cancelReply"
+                                        style="padding: 6px 16px; background: #6c757d; color: #fff; border: none; border-radius: 4px; cursor: pointer;"
+                                    >取消</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="bottoms"></div>
             </div>
         </div>
@@ -74,12 +173,20 @@
                         fileurl: '',
                         deletes: '',
                         types: '',
-                    }
+                    },
+                    // 评论相关数据
+                    comments: [],
+                    commentCount: 0,
+                    newCommentContent: '',
+                    replyToComment: null,
+                    replyContent: '',
+                    userId: this.$store.state.id || 0
                 }
             },
 
             created(){
                 this.NewNotices();
+                this.loadComments();
             },
         
             methods: {
@@ -126,6 +233,117 @@
                         }
                     }).catch(resp => {
                     })
+                },
+                // 加载评论
+                loadComments() {
+                    this.$axios.post('public/GetComments', {
+                        newsId: this.$route.query.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.comments = resp.data.data || [];
+                        }
+                    }).catch(resp => {
+                    });
+                    
+                    // 获取评论数量
+                    this.$axios.post('public/GetCommentCount', {
+                        newsId: this.$route.query.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.commentCount = resp.data.data || 0;
+                        }
+                    }).catch(resp => {
+                    });
+                },
+                // 发表评论
+                submitComment() {
+                    if (!this.newCommentContent.trim()) {
+                        alert('请输入评论内容');
+                        return;
+                    }
+                    
+                    this.$axios.post('public/AddComment', {
+                        newsId: this.$route.query.id,
+                        userId: this.userId,
+                        username: this.$store.state.username,
+                        content: this.newCommentContent,
+                        parentId: 0
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200 && resp.data.success) {
+                            this.newCommentContent = '';
+                            this.loadComments();
+                        } else {
+                            alert('评论失败');
+                        }
+                    }).catch(resp => {
+                        alert('评论失败');
+                    });
+                },
+                // 回复评论
+                replyComment(comment) {
+                    this.replyToComment = comment;
+                    this.replyContent = '';
+                },
+                // 提交回复
+                submitReply() {
+                    if (!this.replyContent.trim()) {
+                        alert('请输入回复内容');
+                        return;
+                    }
+                    
+                    this.$axios.post('public/AddComment', {
+                        newsId: this.$route.query.id,
+                        userId: this.userId,
+                        username: this.$store.state.username,
+                        content: this.replyContent,
+                        parentId: this.replyToComment.id,
+                        replyUserId: this.replyToComment.userId,
+                        replyUsername: this.replyToComment.username
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200 && resp.data.success) {
+                            this.replyToComment = null;
+                            this.replyContent = '';
+                            this.loadComments();
+                        } else {
+                            alert('回复失败');
+                        }
+                    }).catch(resp => {
+                        alert('回复失败');
+                    });
+                },
+                // 取消回复
+                cancelReply() {
+                    this.replyToComment = null;
+                    this.replyContent = '';
+                },
+                // 删除评论
+                deleteComment(commentId) {
+                    if (!confirm('确定要删除这条评论吗？')) {
+                        return;
+                    }
+                    
+                    this.$axios.post('public/DeleteComment', {
+                        id: commentId,
+                        userId: this.userId
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200 && resp.data.success) {
+                            this.loadComments();
+                        } else {
+                            alert('删除失败');
+                        }
+                    }).catch(resp => {
+                        alert('删除失败');
+                    });
                 }
             }
             
