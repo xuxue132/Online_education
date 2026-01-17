@@ -237,3 +237,16 @@ insert (permissionStatus,roleName)VALUES ('1', '用户');
 insert into role_permission (permissionStatus,roleName)VALUES ('1', '用户');
 insert into role_permission (permissionStatus,roleName)VALUES ('2', '管理员');
 update user_role set roleName = '管理员' where telephone = '15178959726';
+
+create table Comment
+(
+    id              int auto_increment
+        primary key,
+    news_id         int          null comment '新闻ID',
+    user_id         int          null comment '用户ID',
+    content         longtext     null comment '评论内容',
+    parent_id       int          null comment '父评论ID（回复时使用）',
+    reply_to_user_id int         null comment '回复的目标用户ID',
+    create_time     timestamp    null comment '创建时间',
+    deleted         int default 0 null comment '删除标记'
+) comment '新闻评论表';

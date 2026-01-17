@@ -151,4 +151,8 @@ public class UserServiceImpl implements UserService {
                 return ResultTool.success("修改成功");
         }
     }
+
+    public UserInf SelectUserByPhone(String telephone) {
+        return userMapper.selectByPhone(telephone);
+    }
 }
