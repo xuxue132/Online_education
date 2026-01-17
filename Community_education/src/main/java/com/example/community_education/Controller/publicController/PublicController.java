@@ -49,6 +49,9 @@ public class PublicController {
     @Resource
     TextPictureImpl textPictureimpl;
 
+    @Resource
+    CommentServiceImpl commentServiceImpl;
+
     /**
      * 用户信息
      *
@@ -442,7 +445,32 @@ public class PublicController {
         newNoticeimpl.NewNoticeHit(map);
     }
 
+    /**
+     * 添加评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/AddComment",method = RequestMethod.POST)
+    public Result AddComment(@RequestBody Map<String, Object> map) {
+        return commentServiceImpl.addComment(map);
+    }
 
+    /**
+     * 获取新闻评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetComments",method = RequestMethod.POST)
+    public Result GetComments(@RequestBody Map<String, Object> map) {
+        return commentServiceImpl.getComments(map);
+    }
+
+    /**
+     * 删除评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/DeleteComment",method = RequestMethod.POST)
+    public Result DeleteComment(@RequestBody Map<String, Object> map) {
+        return commentServiceImpl.deleteComment(map);
+    }
 
 
 }

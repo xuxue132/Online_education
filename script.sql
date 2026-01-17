@@ -230,7 +230,24 @@ create table user_role
     roleName  varchar(30)   null,
     deleted   int default 0 null comment '0'
 )
-    comment '用户角色表';
+comment '用户角色表';
+
+create table comment
+(
+    id          int auto_increment
+        primary key,
+    news_id     int          not null comment '新闻ID',
+    user_id     int          not null comment '用户ID',
+    content     text         not null comment '评论内容',
+    parent_id   int default 0 null comment '父评论ID，0表示一级评论',
+    reply_to_id int default 0 null comment '回复的用户ID',
+    create_time timestamp    null comment '创建时间',
+    deletes     int default 0 null comment '假删除标记',
+    INDEX `idx_news_id` (`news_id`),
+    INDEX `idx_parent_id` (`parent_id`),
+    INDEX `idx_user_id` (`user_id`)
+)
+comment '新闻评论表';
 
 
 insert (permissionStatus,roleName)VALUES ('1', '用户');
