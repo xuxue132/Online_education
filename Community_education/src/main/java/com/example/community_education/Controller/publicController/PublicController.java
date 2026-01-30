@@ -1,6 +1,7 @@
 package com.example.community_education.Controller.publicController;
 
 import com.example.community_education.Service.impl.*;
+import com.example.community_education.Service.NewsCommentService;
 import com.example.community_education.Tool.Result;
 import com.example.community_education.Tool.Token.TokenUtil;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,6 +49,8 @@ public class PublicController {
     FileInformationImpl fileInformationimpl;
     @Resource
     TextPictureImpl textPictureimpl;
+    @Resource
+    NewsCommentService newsCommentService;
 
     /**
      * 用户信息
@@ -440,6 +443,60 @@ public class PublicController {
     @RequestMapping(value = "/NewNoticeHit",method = RequestMethod.POST)
     public void NewNoticeHit(@RequestBody Map<String, Object> map) {
         newNoticeimpl.NewNoticeHit(map);
+    }
+
+    /**
+     * 获取新闻的所有评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetNewsComments", method = RequestMethod.POST)
+    public Result GetNewsComments(@RequestBody Map<String, Object> map) {
+        return newsCommentService.getCommentsByNewsId(map);
+    }
+
+    /**
+     * 添加评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/AddComment", method = RequestMethod.POST)
+    public Result AddComment(@RequestBody Map<String, Object> map) {
+        // 从token中获取用户ID
+        String telephone = TokenUtil.getUsername((String) map.get("token"));
+        map.put("userId", userServiceimpl.getUserIdByTelephone(telephone));
+        return newsCommentService.addComment(map);
+    }
+
+    /**
+     * 删除评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/DeleteComment", method = RequestMethod.POST)
+    public Result DeleteComment(@RequestBody Map<String, Object> map) {
+        // 从token中获取用户ID
+        String telephone = TokenUtil.getUsername((String) map.get("token"));
+        map.put("userId", userServiceimpl.getUserIdByTelephone(telephone));
+        return newsCommentService.deleteComment(map);
+    }
+
+    /**
+     * 获取用户的所有评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetUserComments", method = RequestMethod.POST)
+    public Result GetUserComments(@RequestBody Map<String, Object> map) {
+        // 从token中获取用户ID
+        String telephone = TokenUtil.getUsername((String) map.get("token"));
+        map.put("userId", userServiceimpl.getUserIdByTelephone(telephone));
+        return newsCommentService.getUserComments(map);
+    }
+
+    /**
+     * 获取新闻的评论总数
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetCommentCount", method = RequestMethod.POST)
+    public Result GetCommentCount(@RequestBody Map<String, Object> map) {
+        return newsCommentService.getCommentCount(map);
     }
 
 

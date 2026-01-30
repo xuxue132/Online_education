@@ -44,6 +44,9 @@
                     </div>
                 </div>
                 
+                <!-- 评论组件 -->
+                <NewsComment :newsId="NewNotice.id" v-if="NewNotice.id" />
+                
                 <div class="bottoms"></div>
             </div>
         </div>
@@ -55,9 +58,10 @@
 <script>
     
     import HeadTitle from "@/components/MainBody/HeadTitle";
+    import NewsComment from "@/components/MainBody/NewsComment";
     export default {
         name: "NewText",
-        components: {HeadTitle},
+        components: {HeadTitle, NewsComment},
         data() {
             return {
                 fileList:[],
