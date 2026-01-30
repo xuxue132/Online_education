@@ -48,6 +48,8 @@ public class PublicController {
     FileInformationImpl fileInformationimpl;
     @Resource
     TextPictureImpl textPictureimpl;
+    @Resource
+    NewsCommentServiceImpl newsCommentService;
 
     /**
      * 用户信息
@@ -442,6 +444,32 @@ public class PublicController {
         newNoticeimpl.NewNoticeHit(map);
     }
 
+    /**
+     * 获取新闻评论列表
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetNewsComments",method = RequestMethod.POST)
+    public Result GetNewsComments(@RequestBody Map<String, Object> map) {
+        return newsCommentService.getCommentsByNewsId(map);
+    }
+
+    /**
+     * 添加新闻评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/AddNewsComment",method = RequestMethod.POST)
+    public Result AddNewsComment(@RequestBody Map<String, Object> map) {
+        return newsCommentService.addComment(map);
+    }
+
+    /**
+     * 删除新闻评论
+     *
+     * @param map*/
+    @RequestMapping(value = "/DeleteNewsComment",method = RequestMethod.POST)
+    public Result DeleteNewsComment(@RequestBody Map<String, Object> map) {
+        return newsCommentService.deleteComment(map);
+    }
 
 
 
