@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.NewsCommentMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.NewsComment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="news_id" property="newsId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+    <result column="reply_user_id" property="replyUserId" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="deletes" property="deletes" jdbcType="INTEGER" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="reply_username" property="replyUsername" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="selectCommentsByNewsId" resultMap="BaseResultMap" parameterType="map">
+    select c.*, u.username, ru.username as reply_username
+    from news_comment c
+    left join user_inf u on c.user_id = u.id
+    left join user_inf ru on c.reply_user_id = ru.id
+    where c.news_id = #{newsId,jdbcType=INTEGER} and c.parent_id = 0 and c.deletes = 0
+    order by c.created_at DESC
+  </select>
+
+  <select id="selectRepliesByParentId" resultMap="BaseResultMap" parameterType="map">
+    select c.*, u.username, ru.username as reply_username
+    from news_comment c
+    left join user_inf u on c.user_id = u.id
+    left join user_inf ru on c.reply_user_id = ru.id
+    where c.parent_id = #{parentId,jdbcType=INTEGER} and c.deletes = 0
+    order by c.created_at ASC
+  </select>
+
+  <select id="selectCommentById" resultMap="BaseResultMap" parameterType="map">
+    select c.*, u.username, ru.username as reply_username
+    from news_comment c
+    left join user_inf u on c.user_id = u.id
+    left join user_inf ru on c.reply_user_id = ru.id
+    where c.id = #{id,jdbcType=INTEGER} and c.deletes = 0
+  </select>
+
+  <insert id="insertComment" parameterType="map">
+    insert into news_comment (news_id, user_id, parent_id, reply_user_id, content, created_at, deletes)
+    values (#{newsId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{parentId,jdbcType=INTEGER}, #{replyUserId,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, NOW(), 0)
+  </insert>
+
+  <update id="deleteComment" parameterType="map">
+    update news_comment
+    set deletes = 1
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+</mapper>
