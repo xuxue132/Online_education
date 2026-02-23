@@ -9,6 +9,7 @@ const routes = [
   { path: "/register",name:'register', component: () => import('@/components/Login/Register') },
   { path: "/adminLogin",name:'AdminLogin', component: () => import('@/components/Login/AdminLogin') },
   { path: "/MyInformation",name:'MyInformation', component: () => import('@/components/MainBody/MyInformation')},
+  { path: "/HistoryPage",name:'HistoryPage', component: () => import('@/components/MainBody/HistoryPage')},
   { path: "/NewsPage",name:'NewsPage', component: () => import('@/components/MainBody/NewsPage')},
   { path: "/NoticePage",name:'NoticePage', component: () => import('@/components/MainBody/NoticePage')},
   { path: "/NewText",name:'NewText', component: () => import('@/components/MainBody/NewText')},

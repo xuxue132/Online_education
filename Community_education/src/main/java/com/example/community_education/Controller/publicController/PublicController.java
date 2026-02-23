@@ -21,6 +21,8 @@ public class PublicController {
     @Resource
     NewNoticeImpl newNoticeimpl;
     @Resource
+    BrowseHistoryImpl browseHistoryimpl;
+    @Resource
     LibraryImpl libraryimpl;
     @Resource
     BookContentImpl bookContentimpl;
@@ -442,7 +444,22 @@ public class PublicController {
         newNoticeimpl.NewNoticeHit(map);
     }
 
+    /**
+     * 添加浏览记录
+     *
+     * @param map*/
+    @RequestMapping(value = "/AddBrowseHistory",method = RequestMethod.POST)
+    public Result AddBrowseHistory(@RequestBody Map<String, Object> map) {
+        return browseHistoryimpl.addBrowseHistory(map);
+    }
 
-
+    /**
+     * 获取浏览记录
+     *
+     * @param map*/
+    @RequestMapping(value = "/GetBrowseHistory",method = RequestMethod.POST)
+    public Result GetBrowseHistory(@RequestBody Map<String, Object> map) {
+        return browseHistoryimpl.getBrowseHistory(map);
+    }
 
 }

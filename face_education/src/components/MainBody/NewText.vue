@@ -112,6 +112,17 @@
                             this.NewNotice = resp.data.data
                             this.NewNotice.dates = this.formatDate(new Date(this.NewNotice.dates))
 
+                            if (this.$store.state.Authorization) {
+                                this.$axios.post('public/AddBrowseHistory', {
+                                    newsId: this.NewNotice.id,
+                                    token: this.$store.state.Authorization
+                                }, {
+                                    headers: {'Authorization': this.$store.state.Authorization}
+                                }).then(resp => {
+                                }).catch(resp => {
+                                })
+                            }
+
                             this.$axios.post('public/TextPicture', {
                                 outId: this.NewNotice.id,
                                 types: 1
