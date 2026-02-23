@@ -24,6 +24,7 @@
                 <li><a href="/ReadPage">阅读打卡</a></li>
                 <li><a href="/FilePage">下载中心</a></li>
                 <li><a href="/HonorDisplay">荣誉展示</a></li>
+                <li><a href="/BrowseHistory" v-if="user.username">历史浏览</a></li>
             </ul>
  
         </div>

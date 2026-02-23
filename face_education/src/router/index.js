@@ -23,6 +23,7 @@ const routes = [
   { path: "/PrizeText",name:'PrizeText', component: () => import('@/components/MainBody/Examination/PrizeText')},
   { path: "/HonorDisplay",name:'HonorDisplay', component: () => import('@/components/MainBody/HonorDisplay/HonorDisplay')},
   { path: "/HonorText",name:'HonorText', component: () => import('@/components/MainBody/HonorDisplay/HonorText')},
+  { path: "/BrowseHistory",name:'BrowseHistory', component: () => import('@/components/MainBody/BrowseHistory')},
   { path: "/FirstPage",name:'FirstPage', component: () => import('@/components/MainBody/FirstPage')},
   { path: "/FilePage",name:'FilePage', component: () => import('@/components/MainBody/File/FilePage')},
   { path: "/FileText",name:'FileText', component: () => import('@/components/MainBody/File/FileText')},

@@ -48,6 +48,8 @@ public class PublicController {
     FileInformationImpl fileInformationimpl;
     @Resource
     TextPictureImpl textPictureimpl;
+    @Resource
+    BrowseHistoryImpl browseHistoryimpl;
 
     /**
      * 用户信息
@@ -440,6 +442,33 @@ public class PublicController {
     @RequestMapping(value = "/NewNoticeHit",method = RequestMethod.POST)
     public void NewNoticeHit(@RequestBody Map<String, Object> map) {
         newNoticeimpl.NewNoticeHit(map);
+    }
+
+    /**
+     * 记录用户浏览历史
+     *
+     * @param map*/
+    @RequestMapping(value = "/RecordBrowseHistory",method = RequestMethod.POST)
+    public void RecordBrowseHistory(@RequestBody Map<String, Object> map) {
+        browseHistoryimpl.recordBrowseHistory(map);
+    }
+
+    /**
+     * 获取用户浏览历史
+     *
+     * @param map*/
+    @RequestMapping(value = "/UserBrowseHistory",method = RequestMethod.POST)
+    public Map<String, Object> UserBrowseHistory(@RequestBody Map<String, Object> map) {
+        return browseHistoryimpl.getUserBrowseHistory(map);
+    }
+
+    /**
+     * 获取用户浏览历史数量
+     *
+     * @param map*/
+    @RequestMapping(value = "/UserBrowseHistoryCount",method = RequestMethod.POST)
+    public Map<String, Object> UserBrowseHistoryCount(@RequestBody Map<String, Object> map) {
+        return browseHistoryimpl.getUserBrowseHistoryCount(map);
     }
 
 
