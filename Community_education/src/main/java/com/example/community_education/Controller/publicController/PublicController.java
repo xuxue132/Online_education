@@ -48,6 +48,8 @@ public class PublicController {
     FileInformationImpl fileInformationimpl;
     @Resource
     TextPictureImpl textPictureimpl;
+    @Resource
+    NewsFavoriteImpl newsFavoriteimpl;
 
     /**
      * 用户信息
@@ -442,7 +444,35 @@ public class PublicController {
         newNoticeimpl.NewNoticeHit(map);
     }
 
+    @RequestMapping(value = "/AddFavorite", method = RequestMethod.POST)
+    public Result AddFavorite(@RequestBody Map<String, Object> map) {
+        return newsFavoriteimpl.addFavorite(map);
+    }
 
+    @RequestMapping(value = "/RemoveFavorite", method = RequestMethod.POST)
+    public Result RemoveFavorite(@RequestBody Map<String, Object> map) {
+        return newsFavoriteimpl.removeFavorite(map);
+    }
 
+    @RequestMapping(value = "/CheckFavorite", method = RequestMethod.POST)
+    public Result CheckFavorite(@RequestBody Map<String, Object> map) {
+        return newsFavoriteimpl.checkFavorite(map);
+    }
 
+    @RequestMapping(value = "/FavoriteList", method = RequestMethod.POST)
+    public Result FavoriteList(@RequestBody Map<String, Object> map) {
+        return newsFavoriteimpl.getFavoriteList(map);
+    }
+
+    @RequestMapping(value = "/FavoriteCount", method = RequestMethod.POST)
+    public Result FavoriteCount(@RequestBody Map<String, Object> map) {
+        Integer newsId = (Integer) map.get("newsId");
+        return newsFavoriteimpl.getFavoriteCount(newsId);
+    }
+
+    @RequestMapping(value = "/UserFavoriteCount", method = RequestMethod.POST)
+    public Result UserFavoriteCount(@RequestBody Map<String, Object> map) {
+        Integer userId = (Integer) map.get("userId");
+        return newsFavoriteimpl.getUserFavoriteCount(userId);
+    }
 }
