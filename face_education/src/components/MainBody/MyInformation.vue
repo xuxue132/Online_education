@@ -37,7 +37,10 @@
                     <el-tab-pane label="兑换记录" name="second">
                     <MyPrize></MyPrize>
                     </el-tab-pane>
-    
+                    <el-tab-pane label="我的收藏" name="third">
+                    <MyFavorites></MyFavorites>
+                    </el-tab-pane>
+
                 </el-tabs>
         </div>
         <el-dialog width="700px"  title=":设置头像" :visible.sync="dialogFormVisible" center>
@@ -89,9 +92,10 @@
 <script>
     import MyInf from "@/components/MainBody/MyInf";
     import MyPrize from "@/components/MainBody/MyPrize";
+    import MyFavorites from "@/components/MainBody/MyFavorites";
     export default {
         name: "MyInformation",
-        components: {MyPrize, MyInf},
+        components: {MyPrize, MyInf, MyFavorites},
         data() {
             return {
                 dialogFormVisible: false,

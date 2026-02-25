@@ -36,6 +36,17 @@
                     来源：{{NewNotice.sources}}<i></i>
                     日期：{{NewNotice.dates}}<i></i>
                     点击：{{NewNotice.hits}}<i></i>次
+                    <span class="favorite-box">
+                        <el-button 
+                            :type="isFavorited ? 'warning' : 'default'"
+                            :icon="isFavorited ? 'el-icon-star-on' : 'el-icon-star-off'"
+                            @click="toggleFavorite"
+                            size="small"
+                            class="favorite-btn">
+                            {{isFavorited ? '已收藏' : '收藏'}}
+                        </el-button>
+                        <span class="favorite-count" v-if="favoriteCount > 0">{{favoriteCount}}人收藏</span>
+                    </span>
                 </p>
     
                 <div style="margin-top: 50px" >
@@ -74,12 +85,15 @@
                         fileurl: '',
                         deletes: '',
                         types: '',
-                    }
+                    },
+                    isFavorited: false,
+                    favoriteCount: 0
                 }
             },
 
             created(){
                 this.NewNotices();
+                this.checkFavoriteStatus();
             },
         
             methods: {
@@ -125,6 +139,46 @@
                             })
                         }
                     }).catch(resp => {
+                    })
+                },
+                checkFavoriteStatus() {
+                    if (!this.$store.state.Authorization) {
+                        return
+                    }
+                    this.$axios.post('public/CheckFavorite', {
+                        token: this.$store.state.Authorization,
+                        newsId: this.$route.query.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200 && resp.data.data) {
+                            this.isFavorited = resp.data.data.isFavorited
+                            this.favoriteCount = resp.data.data.favoriteCount || 0
+                        }
+                    }).catch(resp => {
+                    })
+                },
+                toggleFavorite() {
+                    if (!this.$store.state.Authorization) {
+                        this.$message.warning('请先登录')
+                        this.$router.push('/login')
+                        return
+                    }
+                    
+                    const api = this.isFavorited ? 'public/CancelFavorite' : 'public/AddFavorite'
+                    this.$axios.post(api, {
+                        token: this.$store.state.Authorization,
+                        newsId: this.$route.query.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.isFavorited = !this.isFavorited
+                            this.favoriteCount = this.isFavorited ? this.favoriteCount + 1 : this.favoriteCount - 1
+                            this.$message.success(this.isFavorited ? '收藏成功' : '取消收藏成功')
+                        }
+                    }).catch(resp => {
+                        this.$message.error('操作失败')
                     })
                 }
             }
@@ -290,5 +344,18 @@
     }
     .bottoms{
         height: 20px;
+    }
+    .favorite-box {
+        margin-left: 15px;
+        display: inline-flex;
+        align-items: center;
+        vertical-align: middle;
+    }
+    .favorite-btn {
+        margin-right: 8px;
+    }
+    .favorite-count {
+        color: #f0ad4e;
+        font-size: 13px;
     }
 </style>
