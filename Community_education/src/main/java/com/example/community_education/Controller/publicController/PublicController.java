@@ -48,6 +48,8 @@ public class PublicController {
     FileInformationImpl fileInformationimpl;
     @Resource
     TextPictureImpl textPictureimpl;
+    @Resource
+    NewsFavoriteImpl newsFavoriteimpl;
 
     /**
      * 用户信息
@@ -442,6 +444,64 @@ public class PublicController {
         newNoticeimpl.NewNoticeHit(map);
     }
 
+    /**
+     * 添加新闻收藏
+     *
+     * @param map*/
+    @RequestMapping(value = "/AddFavorite",method = RequestMethod.POST)
+    public Result AddFavorite(@RequestBody Map<String, Object> map) {
+        map.put("telephone", TokenUtil.getUsername((String) map.get("token")));
+        return newsFavoriteimpl.addFavorite(map);
+    }
+
+    /**
+     * 取消新闻收藏
+     *
+     * @param map*/
+    @RequestMapping(value = "/CancelFavorite",method = RequestMethod.POST)
+    public Result CancelFavorite(@RequestBody Map<String, Object> map) {
+        map.put("telephone", TokenUtil.getUsername((String) map.get("token")));
+        return newsFavoriteimpl.cancelFavorite(map);
+    }
+
+    /**
+     * 查询新闻收藏状态
+     *
+     * @param map*/
+    @RequestMapping(value = "/CheckFavorite",method = RequestMethod.POST)
+    public Result CheckFavorite(@RequestBody Map<String, Object> map) {
+        map.put("telephone", TokenUtil.getUsername((String) map.get("token")));
+        return newsFavoriteimpl.checkFavoriteStatus(map);
+    }
+
+    /**
+     * 获取用户收藏列表
+     *
+     * @param map*/
+    @RequestMapping(value = "/MyFavorites",method = RequestMethod.POST)
+    public Result MyFavorites(@RequestBody Map<String, Object> map) {
+        map.put("telephone", TokenUtil.getUsername((String) map.get("token")));
+        return newsFavoriteimpl.getUserFavorites(map);
+    }
+
+    /**
+     * 获取用户收藏总数
+     *
+     * @param map*/
+    @RequestMapping(value = "/MyFavoriteCount",method = RequestMethod.POST)
+    public Result MyFavoriteCount(@RequestBody Map<String, Object> map) {
+        map.put("telephone", TokenUtil.getUsername((String) map.get("token")));
+        return newsFavoriteimpl.getUserFavoriteCount(map);
+    }
+
+    /**
+     * 获取新闻收藏数
+     *
+     * @param map*/
+    @RequestMapping(value = "/NewsFavoriteCount",method = RequestMethod.POST)
+    public Result NewsFavoriteCount(@RequestBody Map<String, Object> map) {
+        return newsFavoriteimpl.getNewsFavoriteCount(map);
+    }
 
 
 

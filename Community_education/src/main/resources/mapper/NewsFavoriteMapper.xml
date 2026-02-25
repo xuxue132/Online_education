@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.NewsFavoriteMapper" >
+
+    <resultMap id="BaseResultMap" type="com.example.community_education.Model.NewsFavorite" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="news_id" property="newsId" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <resultMap id="WithNewsResultMap" type="com.example.community_education.Model.NewsFavorite" extends="BaseResultMap">
+        <association property="newsInfo" javaType="com.example.community_education.Model.NewNotice">
+            <id column="news_id" property="id" jdbcType="INTEGER" />
+            <result column="title" property="title" jdbcType="VARCHAR" />
+            <result column="author" property="author" jdbcType="VARCHAR" />
+            <result column="sources" property="sources" jdbcType="VARCHAR" />
+            <result column="dates" property="dates" jdbcType="TIMESTAMP" />
+            <result column="hits" property="hits" jdbcType="INTEGER" />
+            <result column="types" property="types" jdbcType="INTEGER" />
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, user_id, news_id, create_time
+    </sql>
+
+    <!-- 添加收藏 -->
+    <insert id="insert" parameterType="com.example.community_education.Model.NewsFavorite" >
+        INSERT INTO news_favorite (user_id, news_id, create_time)
+        VALUES (#{userId,jdbcType=INTEGER}, #{newsId,jdbcType=INTEGER}, NOW())
+    </insert>
+
+    <!-- 删除收藏 -->
+    <delete id="deleteByUserAndNews">
+        DELETE FROM news_favorite
+        WHERE user_id = #{userId,jdbcType=INTEGER} AND news_id = #{newsId,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 查询用户是否已收藏某新闻 -->
+    <select id="selectByUserAndNews" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM news_favorite
+        WHERE user_id = #{userId,jdbcType=INTEGER} AND news_id = #{newsId,jdbcType=INTEGER}
+    </select>
+
+    <!-- 查询用户的所有收藏 -->
+    <select id="selectByUserId" resultMap="WithNewsResultMap">
+        SELECT
+            f.id, f.user_id, f.news_id, f.create_time,
+            n.title, n.author, n.sources, n.dates, n.hits, n.types
+        FROM news_favorite f
+        LEFT JOIN New_Notice n ON f.news_id = n.id
+        WHERE f.user_id = #{userId,jdbcType=INTEGER}
+        AND n.deletes = 0
+        ORDER BY f.create_time DESC
+    </select>
+
+    <!-- 查询用户的收藏列表（分页） -->
+    <select id="selectByUserIdWithPage" resultMap="WithNewsResultMap" parameterType="map">
+        SELECT
+            f.id, f.user_id, f.news_id, f.create_time,
+            n.title, n.author, n.sources, n.dates, n.hits, n.types
+        FROM news_favorite f
+        LEFT JOIN New_Notice n ON f.news_id = n.id
+        WHERE f.user_id = #{userId,jdbcType=INTEGER}
+        AND n.deletes = 0
+        ORDER BY f.create_time DESC
+        LIMIT #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+
+    <!-- 查询用户收藏总数 -->
+    <select id="countByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM news_favorite f
+        LEFT JOIN New_Notice n ON f.news_id = n.id
+        WHERE f.user_id = #{userId,jdbcType=INTEGER}
+        AND n.deletes = 0
+    </select>
+
+    <!-- 查询新闻被收藏的次数 -->
+    <select id="countByNewsId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM news_favorite
+        WHERE news_id = #{newsId,jdbcType=INTEGER}
+    </select>
+
+    <!-- 批量查询多个新闻的收藏数 -->
+    <select id="countByNewsIds" resultType="java.util.HashMap">
+        SELECT news_id as newsId, COUNT(*) as favoriteCount
+        FROM news_favorite
+        WHERE news_id IN
+        <foreach collection="newsIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        GROUP BY news_id
+    </select>
+
+</mapper>
