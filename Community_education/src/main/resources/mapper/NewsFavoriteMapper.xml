@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.NewsFavoriteMapper" >
+
+  <insert id="insert" parameterType="map">
+    insert into news_favorite (user_id, news_id, create_time)
+    values (#{userId,jdbcType=INTEGER}, #{newsId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <delete id="delete" parameterType="map">
+    delete from news_favorite where user_id = #{userId,jdbcType=INTEGER} and news_id = #{newsId,jdbcType=INTEGER}
+  </delete>
+
+  <select id="checkFavorite" resultType="java.lang.Integer" parameterType="map">
+    select count(*) from news_favorite where user_id = #{userId,jdbcType=INTEGER} and news_id = #{newsId,jdbcType=INTEGER}
+  </select>
+
+  <select id="countFavoriteByNewsId" resultType="java.lang.Integer" parameterType="map">
+    select count(*) from news_favorite where news_id = #{newsId,jdbcType=INTEGER}
+  </select>
+
+  <select id="getMyFavorites" resultType="java.util.HashMap" parameterType="map">
+    select 
+      n.id, n.title, n.dates, n.types, n.hits,
+      n.id as newsId,
+      f.create_time as createTime,
+      (select count(*) from news_favorite where news_id = n.id) as favoriteCount
+    from news_favorite f
+    left join New_Notice n on f.news_id = n.id
+    where f.user_id = #{userId,jdbcType=INTEGER} and n.deletes = 0
+    order by f.create_time DESC
+  </select>
+
+</mapper>

@@ -3,6 +3,7 @@ package com.example.community_education.Service.impl;
 import com.example.community_education.Dao.UserMapper;
 import com.example.community_education.Dao.UserRoleMapper;
 import com.example.community_education.Model.UserInf;
+import com.example.community_education.Model.UserInfRole;
 import com.example.community_education.Service.UserService;
 import com.example.community_education.Tool.Result;
 import com.example.community_education.Tool.ResultTool;
@@ -150,5 +151,9 @@ public class UserServiceImpl implements UserService {
                 userMapper.ChangePasswordPlus(map);
                 return ResultTool.success("修改成功");
         }
+    }
+
+    public UserInfRole getUserByTelephone(String telephone) {
+        return userMapper.selectPeopleByThePhone(telephone);
     }
 }
