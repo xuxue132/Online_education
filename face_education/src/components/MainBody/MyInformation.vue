@@ -37,6 +37,9 @@
                     <el-tab-pane label="兑换记录" name="second">
                     <MyPrize></MyPrize>
                     </el-tab-pane>
+                    <el-tab-pane label="我的收藏" name="third">
+                    <MyFavorite></MyFavorite>
+                    </el-tab-pane>
     
                 </el-tabs>
         </div>
@@ -89,9 +92,10 @@
 <script>
     import MyInf from "@/components/MainBody/MyInf";
     import MyPrize from "@/components/MainBody/MyPrize";
+    import MyFavorite from "@/components/MainBody/MyFavorite";
     export default {
         name: "MyInformation",
-        components: {MyPrize, MyInf},
+        components: {MyPrize, MyInf, MyFavorite},
         data() {
             return {
                 dialogFormVisible: false,

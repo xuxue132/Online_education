@@ -36,7 +36,18 @@
                     来源：{{NewNotice.sources}}<i></i>
                     日期：{{NewNotice.dates}}<i></i>
                     点击：{{NewNotice.hits}}<i></i>次
+                    <span style="margin-left: 15px;">收藏：{{favoriteCount}}次</span>
                 </p>
+
+                <div class="favorite-btn-wrapper" v-if="isLoggedIn">
+                    <el-button 
+                        :type="isFavorite ? 'warning' : 'primary'" 
+                        :icon="isFavorite ? 'el-icon-star-on' : 'el-icon-star-off'"
+                        @click="toggleFavorite"
+                        :loading="favoriteLoading">
+                        {{isFavorite ? '已收藏' : '收藏'}}
+                    </el-button>
+                </div>
     
                 <div style="margin-top: 50px" >
                     <div class="lists" >
@@ -61,6 +72,11 @@
         data() {
             return {
                 fileList:[],
+                isFavorite: false,
+                favoriteCount: 0,
+                favoriteLoading: false,
+                isLoggedIn: false,
+                userId: null,
                     NewNotice:{
                         id: 0,
                         title: '',
@@ -79,11 +95,100 @@
             },
 
             created(){
+                this.checkLogin();
                 this.NewNotices();
             },
         
             methods: {
-                //格式化时间
+                checkLogin() {
+                    const token = this.$store.state.Authorization;
+                    if (token && token !== '') {
+                        this.isLoggedIn = true;
+                        this.getUserId();
+                    }
+                },
+                getUserId() {
+                    this.$axios.post('public/MyInformation', {
+                        token: this.$store.state.Authorization
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.userId = resp.data.data.id;
+                            if (this.NewNotice.id) {
+                                this.checkFavoriteStatus();
+                            }
+                        }
+                    }).catch(resp => {
+                    })
+                },
+                checkFavoriteStatus() {
+                    if (!this.userId || !this.NewNotice.id) return;
+                    this.$axios.post('public/CheckFavorite', {
+                        userId: this.userId,
+                        newsId: this.NewNotice.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.isFavorite = resp.data.data.isFavorite;
+                        }
+                    }).catch(resp => {
+                    })
+                },
+                getFavoriteCount() {
+                    if (!this.NewNotice.id) return;
+                    this.$axios.post('public/FavoriteCount', {
+                        newsId: this.NewNotice.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.favoriteCount = resp.data.data;
+                        }
+                    }).catch(resp => {
+                    })
+                },
+                toggleFavorite() {
+                    if (!this.userId) {
+                        this.$message.warning('请先登录');
+                        return;
+                    }
+                    this.favoriteLoading = true;
+                    if (this.isFavorite) {
+                        this.$axios.post('public/RemoveFavorite', {
+                            userId: this.userId,
+                            newsId: this.NewNotice.id
+                        }, {
+                            headers: {'Authorization': this.$store.state.Authorization}
+                        }).then(resp => {
+                            this.favoriteLoading = false;
+                            if (resp.status === 200) {
+                                this.isFavorite = false;
+                                this.favoriteCount = Math.max(0, this.favoriteCount - 1);
+                                this.$message.success('取消收藏成功');
+                            }
+                        }).catch(resp => {
+                            this.favoriteLoading = false;
+                        })
+                    } else {
+                        this.$axios.post('public/AddFavorite', {
+                            userId: this.userId,
+                            newsId: this.NewNotice.id
+                        }, {
+                            headers: {'Authorization': this.$store.state.Authorization}
+                        }).then(resp => {
+                            this.favoriteLoading = false;
+                            if (resp.status === 200) {
+                                this.isFavorite = true;
+                                this.favoriteCount = this.favoriteCount + 1;
+                                this.$message.success('收藏成功');
+                            }
+                        }).catch(resp => {
+                            this.favoriteLoading = false;
+                        })
+                    }
+                },
                 formatDate(date) {
                     if (typeof date === 'string'){
                         return date
@@ -111,6 +216,10 @@
                         if (resp.status === 200) {
                             this.NewNotice = resp.data.data
                             this.NewNotice.dates = this.formatDate(new Date(this.NewNotice.dates))
+                            this.getFavoriteCount();
+                            if (this.userId) {
+                                this.checkFavoriteStatus();
+                            }
 
                             this.$axios.post('public/TextPicture', {
                                 outId: this.NewNotice.id,
@@ -145,7 +254,6 @@
         height: 250px;
         width: 100%;
         background: url("http://rcqmzsxxw.com/rchema/xuexiwang/img/public/head_bg.png");
-        /*background: url("https://api.ixiaowai.cn/gqapi/gqapi.php");*/
         background-size: cover;
     }
     .sub_left {
@@ -225,36 +333,6 @@
         line-height: 29px;
     }
 
-    /*.time {*/
-    /*    color: #999;*/
-    /*    padding: 0 0 0 27px;*/
-    /*    background: url("https://www.cqut.edu.cn/images/sub07_1_time2.png") left center no-repeat;*/
-    /*    line-height: 20px;*/
-    /*    font-family: arial;*/
-    /*}*/
-    /*.title {*/
-    /*    display: block;*/
-    /*    overflow: hidden;*/
-    /*    text-overflow: ellipsis;*/
-    /*    margin: 6px 0 0;*/
-    /*    height: 26px;*/
-    /*    line-height: 26px;*/
-    /*    white-space: nowrap;*/
-    /*    color: #333;*/
-    /*}*/
-    
-
-    /*.fs16 {*/
-    /*    font-size: 16px;*/
-    /*}*/
-    
-    /*.info{*/
-    /*    display: block;*/
-    /*    margin: 0 0 30px;*/
-    /*    padding: 13px 15px;*/
-    /*    border: 1px solid #f2f2f2;*/
-    /*    border-left: 5px solid #e2e2e2;*/
-    /*}*/
     .bread {
         color: #a6a6a6;
         line-height: 40px;
@@ -290,5 +368,9 @@
     }
     .bottoms{
         height: 20px;
+    }
+    .favorite-btn-wrapper {
+        text-align: center;
+        margin: 20px 0;
     }
 </style>
