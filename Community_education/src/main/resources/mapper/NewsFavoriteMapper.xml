@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.community_education.Dao.NewsFavoriteMapper" >
+  <resultMap id="BaseResultMap" type="com.example.community_education.Model.NewsFavorite" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="news_id" property="newsId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, user_id, news_id, create_time
+  </sql>
+
+  <insert id="insert" parameterType="com.example.community_education.Model.NewsFavorite">
+    insert into news_favorite (user_id, news_id, create_time)
+    values (#{userId,jdbcType=INTEGER}, #{newsId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <delete id="deleteByUserAndNews" parameterType="map">
+    delete from news_favorite
+    where user_id = #{userId,jdbcType=INTEGER} and news_id = #{newsId,jdbcType=INTEGER}
+  </delete>
+
+  <select id="selectByUserAndNews" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from news_favorite
+    where user_id = #{userId,jdbcType=INTEGER} and news_id = #{newsId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByUserId" resultType="map" parameterType="map">
+    select nf.id as favoriteId, nf.news_id as newsId, 
+           DATE_FORMAT(nf.create_time, '%Y-%m-%d %H:%i:%s') as createTime,
+           n.title, n.author, n.sources, n.dates, n.hits
+    from news_favorite nf
+    left join New_Notice n on nf.news_id = n.id
+    where nf.user_id = #{userId,jdbcType=INTEGER}
+    order by nf.create_time desc
+    limit #{offset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+
+  <select id="countByNewsId" resultType="java.lang.Integer">
+    select count(*) from news_favorite where news_id = #{newsId,jdbcType=INTEGER}
+  </select>
+
+  <select id="countByUserId" resultType="java.lang.Integer">
+    select count(*) from news_favorite where user_id = #{userId,jdbcType=INTEGER}
+  </select>
+</mapper>
