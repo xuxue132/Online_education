@@ -34,8 +34,14 @@
                         <ul v-for="NewNotice in NewNotices" >
                             <li >
                                 <a class="info" @click="TurnPage(NewNotice.id,NewNotice.type)">
-                                <div class="time fs14">{{NewNotice.dates}}</div>
                                 <div class="title fs16">{{NewNotice.title}}</div>
+                                <div class="time fs14">
+                                    <span>{{NewNotice.dates}}</span>
+                                    <span class="favorite-count" style="margin-left: 20px;">
+                                        <i class="el-icon-star-on" style="color: #f0ad4e;"></i>
+                                        {{NewNotice.favoriteCount || 0}} 人收藏
+                                    </span>
+                                </div>
                             </a>
                             </li>
 
@@ -69,6 +75,7 @@
                 NewNotices:[],
                 number:0,
                 page:1,
+                favoriteMap: {},
             }
         },
         created(){
@@ -126,7 +133,7 @@
                         for (var i=0;i<this.NewNotices.length;i++) {
                             this.NewNotices[i].dates = this.formatDate(new Date(this.NewNotices[i].dates))
                         }
-
+                        this.loadFavoriteCounts();
                     }
                 }).catch(resp => {
                 })
@@ -145,6 +152,19 @@
                 }).catch(resp => {
                 })
                 
+            },
+            loadFavoriteCounts() {
+                this.NewNotices.forEach(news => {
+                    this.$axios.post('public/CountFavorite', {
+                        newsId: news.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            news.favoriteCount = resp.data.data;
+                        }
+                    }).catch(resp => {});
+                });
             }
         }
     }

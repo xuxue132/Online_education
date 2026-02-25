@@ -44,6 +44,20 @@
                     </div>
                 </div>
                 
+                <div>
+                    <el-button 
+                        :type="isFavorited ? 'warning' : 'primary'" 
+                        @click="toggleFavorite" 
+                        size="small"
+                        style="margin-top: 20px; margin-left: 40px;"
+                        :disabled="!isLoggedIn">
+                        <i :class="isFavorited ? 'el-icon-star-on' : 'el-icon-star-off'"></i>
+                        {{ isFavorited ? '取消收藏' : '收藏' }}
+                    </el-button>
+                    <span style="margin-left: 10px; color: #969696;">
+                        <i class="el-icon-star-on" style="color: #f0ad4e;"></i> {{ favoriteCount }} 人收藏
+                    </span>
+                </div>
                 <div class="bottoms"></div>
             </div>
         </div>
@@ -61,6 +75,9 @@
         data() {
             return {
                 fileList:[],
+                isFavorited: false,
+                favoriteCount: 0,
+                isLoggedIn: false,
                     NewNotice:{
                         id: 0,
                         title: '',
@@ -79,10 +96,60 @@
             },
 
             created(){
+                this.checkLoginStatus();
                 this.NewNotices();
             },
         
             methods: {
+                checkLoginStatus() {
+                    const token = this.$store.state.Authorization;
+                    this.isLoggedIn = token && token !== '' && token !== 'null';
+                },
+                toggleFavorite() {
+                    if (!this.isLoggedIn) {
+                        this.$message.warning('请先登录');
+                        return;
+                    }
+                    const api = this.isFavorited ? 'public/RemoveFavorite' : 'public/AddFavorite';
+                    this.$axios.post(api, {
+                        newsId: this.NewNotice.id,
+                        token: this.$store.state.Authorization
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.isFavorited = !this.isFavorited;
+                            this.favoriteCount += this.isFavorited ? 1 : -1;
+                            this.$message.success(this.isFavorited ? '收藏成功' : '取消收藏成功');
+                        }
+                    }).catch(resp => {
+                        this.$message.error('操作失败');
+                    });
+                },
+                checkFavoriteStatus() {
+                    if (!this.isLoggedIn) return;
+                    this.$axios.post('public/CheckFavorite', {
+                        newsId: this.NewNotice.id,
+                        token: this.$store.state.Authorization
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.isFavorited = resp.data.data > 0;
+                        }
+                    }).catch(resp => {});
+                },
+                loadFavoriteCount() {
+                    this.$axios.post('public/CountFavorite', {
+                        newsId: this.NewNotice.id
+                    }, {
+                        headers: {'Authorization': this.$store.state.Authorization}
+                    }).then(resp => {
+                        if (resp.status === 200) {
+                            this.favoriteCount = resp.data.data;
+                        }
+                    }).catch(resp => {});
+                },
                 //格式化时间
                 formatDate(date) {
                     if (typeof date === 'string'){
@@ -111,6 +178,8 @@
                         if (resp.status === 200) {
                             this.NewNotice = resp.data.data
                             this.NewNotice.dates = this.formatDate(new Date(this.NewNotice.dates))
+                            this.checkFavoriteStatus();
+                            this.loadFavoriteCount();
 
                             this.$axios.post('public/TextPicture', {
                                 outId: this.NewNotice.id,
